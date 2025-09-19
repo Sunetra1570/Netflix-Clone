@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Netflix Clone</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div class="container" id="login-container">
+		<form id="login-form">
+			<h1>Sign In</h1>
+			<div class="demo-notice">
+				<small>🎭 Demo credentials auto-filled - just click Sign In!</small>
+				<button type="button" id="refresh-credentials" class="refresh-btn">🔄 New Credentials</button>
+			</div>
+			<input type="text" id="userId" placeholder="Email or phone number" required>
+			<input type="password" id="password" placeholder="Password" required>
+			<button type="submit">Sign In</button>
+			<div class="login-help">
+				<span><input type="checkbox" id="remember"> Remember me</span>
+				<a href="#">Need help?</a>
+			</div>
+		</form>
+		<div id="credentials-display" class="credentials-display"></div>
+	</div>
+
+	<div class="main-content" id="main-content" style="display:none;">
+		<header class="topnav" id="topnav">
+			<div class="left">
+				<button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">☰</button>
+				<h1 class="logo">Netflix</h1>
+				<nav class="nav-links" id="nav-links">
+					<a href="#home" class="active">Home</a>
+					<a href="#tv">TV Shows</a>
+					<a href="#movies">Movies</a>
+					<a href="#my-list" id="my-list-link">My List</a>
+				</nav>
+			</div>
+			<div class="right">
+				<div class="search-container">
+					<input type="search" id="search-input" placeholder="Search movies, shows..." aria-label="Search">
+					<span class="search-icon" id="search-icon">🔍</span>
+					<button class="search-clear" id="search-clear" aria-label="Clear search">✕</button>
+				</div>
+				<button id="random-movie-btn" class="navbar-btn" title="Surprise Me">🎲 Surprise</button>
+				<div class="notif" id="notif">
+					<button id="notif-btn" class="notif-btn" aria-haspopup="true" aria-expanded="false" title="Notifications">🔔<span class="dot" id="notif-dot"></span></button>
+					<div class="notif-menu" id="notif-menu" style="display:none;">
+						<div class="notif-item"><strong>New</strong> Episode of Stranger Things</div>
+						<div class="notif-item">Recommended: Money Heist</div>
+					</div>
+				</div>
+				<div class="profile" id="profile">
+					<img id="profile-avatar" alt="Profile" src="https://i.pravatar.cc/40?img=12">
+					<div class="profile-menu" id="profile-menu" style="display:none;">
+						<button id="logout-btn" class="logout-btn">
+							<span class="logout-icon">🚪</span>
+							<span class="logout-text">Sign out</span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<section class="hero" id="home">
+			<div class="hero-bg"></div>
+			<video id="hero-video" class="hero-video" autoplay muted playsinline loop></video>
+			<div class="hero-content">
+				<h2 id="hero-title">Featured Title</h2>
+				<p id="hero-desc">Watch something incredible today.</p>
+				<div class="hero-actions">
+					<button id="hero-play">▶ Play</button>
+					<button id="hero-more">ℹ More Info</button>
+				</div>
+			</div>
+		</section>
+
+		<section class="rows" id="rows"></section>
+
+		<section class="search-results" id="search-results" style="display:none;">
+			<h2>Search Results</h2>
+			<div class="row-cards" id="search-cards"></div>
+		</section>
+
+		<section class="my-list-section" id="my-list">
+			<h2>My List</h2>
+			<div class="row-cards" id="my-list-cards"></div>
+		</section>
+	</div>
+
+	<!-- App loading overlay -->
+	<div id="app-loading" class="app-loading" style="display:none;">
+		<div class="spinner"></div>
+	</div>
+
+	<!-- Details Modal -->
+	<div class="modal" id="details-modal" aria-hidden="true" style="display:none;">
+		<div class="modal-backdrop" id="modal-backdrop"></div>
+		<div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+			<button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+			<img id="modal-image" alt="Poster" />
+			<div class="modal-body">
+				<h3 id="modal-title"></h3>
+				<p id="modal-overview"></p>
+				<div class="modal-actions">
+					<button id="modal-play">▶ Play</button>
+					<button id="modal-trailer">▶ Trailer</button>
+					<button id="modal-add">＋ Add to My List</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Trailer Player Modal -->
+	<div class="player-modal" id="player-modal" style="display:none;" aria-hidden="true">
+		<div class="player-backdrop" id="player-backdrop"></div>
+		<div class="player-content">
+			<button class="player-close" id="player-close" aria-label="Close">✕</button>
+			<div class="player-frame-wrap">
+				<iframe id="yt-frame" title="Trailer"
+					allow="autoplay; encrypted-media; picture-in-picture"
+					allowfullscreen
+					frameborder="0"></iframe>
+			</div>
+		</div>
+	</div>
+
+	<!-- Credentials banner (demo) -->
+	<!-- removed credentials banner -->
+
+	<script src="netflix.js"></script>
+</body>
+</html>
