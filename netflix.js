@@ -503,7 +503,7 @@ async function renderSearch(query) {
     const myListSection = qs('#my-list') || qs('.my-list-section');
     
     if (!query || query.trim().length < 2) {
-        resultsWrap.style.display = 'none';
+        resultsWrap.classList.remove('active');
         cards.innerHTML = '';
         // Restore the currently active section when search is cleared
         const activeLink = qs('.nav-links a.active');
@@ -516,6 +516,7 @@ async function renderSearch(query) {
     home && (home.style.display = 'none');
     rows && (rows.style.display = 'none');
     myListSection && (myListSection.style.display = 'none');
+    resultsWrap.classList.add('active');
     
     const loading = qs('#app-loading');
     loading && (loading.style.display = 'flex');
@@ -527,20 +528,18 @@ async function renderSearch(query) {
         
         if (items.length > 0) {
             items.forEach(i => cards.appendChild(createCard(i)));
-            resultsWrap.style.display = 'block';
         } else {
             // Enhanced no results message
             cards.innerHTML = `
                 <div class="search-no-results">
-                    <h3>No results found for "${query}"</h3>
-                    <p>Try searching for:</p>
-                    <ul style="list-style: none; padding: 0; margin: 1rem 0;">
-                        <li>• Different keywords</li>
-                        <li>• TV show titles</li>
-                        <li>• Actor or director names</li>
-                        <li>• Genres like "comedy" or "drama"</li>
+                    <div class="no-results-icon">😕</div>
+                    <h3 class="no-results-title">No results found for "${query}"</h3>
+                    <p class="no-results-suggestion">Suggestions:</p>
+                    <ul class="no-results-list">
+                        <li>Try different keywords</li>
+                        <li>Looking for a movie or TV show?</li>
+                        <li>Check your spelling</li>
                     </ul>
-                    <p style="color: #888;">Or browse our <a href="#" onclick="document.querySelector('[href=\\\"#movies\\\"]').click(); return false;" style="color: #e50914;">Movies</a> and <a href="#" onclick="document.querySelector('[href=\\\"#tv\\\"]').click(); return false;" style="color: #e50914;">TV Shows</a> sections.</p>
                 </div>
             `;
             resultsWrap.style.display = 'block';
