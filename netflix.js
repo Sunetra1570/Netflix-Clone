@@ -455,6 +455,33 @@ async function openModalById(media, id) {
             closeModal();
             openPlayer(getTrailerIdFor(item.title));
         };
+    
+    // Ensure close event listeners are attached every time modal opens
+    const closeBtn = qs('#modal-close');
+    const backdrop = qs('#modal-backdrop');
+    
+    // Remove any existing listeners to prevent duplicates
+    if (closeBtn) {
+        closeBtn.replaceWith(closeBtn.cloneNode(true));
+        const newCloseBtn = qs('#modal-close');
+        newCloseBtn.addEventListener('click', closeModal);
+    }
+    
+    if (backdrop) {
+        backdrop.replaceWith(backdrop.cloneNode(true));
+        const newBackdrop = qs('#modal-backdrop');
+        newBackdrop.addEventListener('click', closeModal);
+    }
+    
+    // Add keyboard support for Escape key
+    const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+            closeModal();
+            document.removeEventListener('keydown', handleEscape);
+        }
+    };
+    document.addEventListener('keydown', handleEscape);
+    
     const modal = qs('#details-modal');
     modal.style.display = 'block';
     modal.setAttribute('aria-hidden', 'false');
@@ -693,6 +720,8 @@ async function loadSectionContent(sectionName) {
                 console.error('Failed to load TV shows:', e);
             } finally {
                 loading && (loading.style.display = 'none');
+                // Refresh notifications after loading content
+                generateNotifications();
             }
             break;
             
@@ -741,12 +770,133 @@ async function loadSectionContent(sectionName) {
                 }
             } finally {
                 loading && (loading.style.display = 'none');
+                // Refresh notifications after loading content
+                generateNotifications();
             }
             break;
             
         case 'my-list':
             await renderMyList();
+            // Refresh notifications after loading my list
+            generateNotifications();
             break;
+    }
+}
+
+// Generate dynamic notifications with clickable content
+async function generateNotifications() {
+    const notifMenu = qs('#notif-menu');
+    if (!notifMenu) return;
+    
+    try {
+        // Create some predefined notifications with real content that should exist
+        const notifications = [];
+        
+        // Add some TV show notifications with popular shows
+        const popularShows = [
+            { title: 'Stranger Things', media: 'tv', id: '2' },
+            { title: 'The Office', media: 'tv', id: '526' },
+            { title: 'Breaking Bad', media: 'tv', id: '1396' },
+            { title: 'Money Heist', media: 'tv', id: '71446' },
+            { title: 'The Crown', media: 'tv', id: '1399' }
+        ];
+        
+        const popularMovies = [
+            { title: 'The Dark Knight', media: 'movie', id: '155' },
+            { title: 'Inception', media: 'movie', id: '27205' },
+            { title: 'Pulp Fiction', media: 'movie', id: '680' },
+            { title: 'The Godfather', media: 'movie', id: '238' },
+            { title: 'Forrest Gump', media: 'movie', id: '13' }
+        ];
+        
+        // Randomly select content for notifications
+        const randomShow = popularShows[Math.floor(Math.random() * popularShows.length)];
+        const randomMovie = popularMovies[Math.floor(Math.random() * popularMovies.length)];
+        const trendingShow = popularShows[Math.floor(Math.random() * popularShows.length)];
+        
+        // Add notifications
+        notifications.push({
+            type: 'new_episode',
+            title: `New Episode Available`,
+            content: `${randomShow.title} - Season ${Math.floor(Math.random() * 5) + 1}`,
+            item: randomShow,
+            icon: '🎬'
+        });
+        
+        notifications.push({
+            type: 'recommendation',
+            title: 'Recommended for You',
+            content: randomMovie.title,
+            item: randomMovie,
+            icon: '⭐'
+        });
+        
+        notifications.push({
+            type: 'trending',
+            title: 'Trending Now',
+            content: trendingShow.title,
+            item: trendingShow,
+            icon: '🔥'
+        });
+        
+        // Generate notification HTML
+        notifMenu.innerHTML = notifications.map(notif => `
+            <div class="notif-item clickable-notif" data-media="${notif.item.media}" data-id="${notif.item.id}">
+                <div class="notif-icon">${notif.icon}</div>
+                <div class="notif-content">
+                    <div class="notif-title">${notif.title}</div>
+                    <div class="notif-text">${notif.content}</div>
+                </div>
+            </div>
+        `).join('');
+        
+        // Add click handlers to notifications
+        const clickableNotifs = notifMenu.querySelectorAll('.clickable-notif');
+        clickableNotifs.forEach(notif => {
+            notif.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const media = notif.getAttribute('data-media');
+                const id = notif.getAttribute('data-id');
+                
+                // Close notification menu
+                notifMenu.style.display = 'none';
+                
+                // Open the show/movie modal
+                if (media && id) {
+                    try {
+                        await openModalById(media, id);
+                    } catch (error) {
+                        console.log('Could not open content:', error);
+                        // Fallback: show a simple alert
+                        alert(`Opening ${notif.querySelector('.notif-text').textContent}...`);
+                    }
+                }
+            });
+        });
+        
+        // Show notification dot
+        const notifDot = qs('#notif-dot');
+        if (notifDot) {
+            notifDot.style.display = 'block';
+        }
+        
+    } catch (error) {
+        console.log('Could not generate notifications:', error);
+        // Fallback notifications that don't require API calls
+        notifMenu.innerHTML = `
+            <div class="notif-item">
+                <div class="notif-content">
+                    <div class="notif-title">🎬 Welcome to Netflix!</div>
+                    <div class="notif-text">Explore thousands of movies and shows</div>
+                </div>
+            </div>
+            <div class="notif-item">
+                <div class="notif-content">
+                    <div class="notif-title">⭐ Featured Content</div>
+                    <div class="notif-text">Check out our trending section</div>
+                </div>
+            </div>
+        `;
     }
 }
 
@@ -961,6 +1111,9 @@ function init() {
             const notifMenu = qs('#notif-menu');
             const notifDot = qs('#notif-dot');
             if (notifBtn && notifMenu) {
+                // Generate dynamic notifications
+                generateNotifications();
+                
                 notifBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const visible = notifMenu.style.display !== 'none';
