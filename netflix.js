@@ -11,6 +11,7 @@ async function tvmaze(path, params = {}) {
     return res.json();
 }
 
+
 // OMDb API client (free, no key needed for basic searches)
 const OMDB_BASE = 'https://www.omdbapi.com';
 
